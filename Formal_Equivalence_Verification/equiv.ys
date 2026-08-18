@@ -1,0 +1,16 @@
+read_ilang rtl_mapped.il
+design -stash gold
+
+read_ilang generic_mapped.il
+design -stash gate
+
+design -reset
+design -copy-from gold -as gold top
+design -copy-from gate -as gate top
+
+equiv_make gold gate equiv
+prep -top equiv -flatten
+
+equiv_simple
+equiv_induct
+equiv_status -assert
