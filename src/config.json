@@ -1,0 +1,67 @@
+{
+  "DESIGN_NAME": "top",
+
+  "VERILOG_FILES": [
+    "dir::adder.sv",
+    "dir::alu.sv",
+    "dir::alu_decoder.sv",
+    "dir::apb_master.sv",
+    "dir::apb_slave_pwm.sv",
+    "dir::apb_slave_timer.sv",
+    "dir::apb_slave_uart.sv",
+    "dir::baud_rate.sv",
+    "dir::bridge.sv",
+    "dir::controller.sv",
+    "dir::control_logic.sv",
+    "dir::core.sv",
+    "dir::datapath.sv",
+    "dir::decoder_logic.sv",
+    "dir::deserializer.sv",
+    "dir::d_ff.sv",
+    "dir::dmem.sv",
+    "dir::extender.sv",
+    "dir::fifo.sv",
+    "dir::fifo_master.sv",
+    "dir::imem.sv",
+    "dir::main_decoder.sv",
+    "dir::master.sv",
+    "dir::mux_2.sv",
+    "dir::mux_3.sv",
+    "dir::normal.sv",
+    "dir::pwm.sv",
+    "dir::register_file.sv",
+    "dir::serializer.sv",
+    "dir::square.sv",
+    "dir::timer.sv",
+    "dir::top.sv",
+    "dir::uart_rx.sv",
+    "dir::uart_soc.sv",
+    "dir::uart_tx.sv"
+  ],
+
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 50,
+
+  "FP_PDN_CORE_RING": true,
+
+  "FP_SIZING": "absolute",
+  "DIE_AREA": "0 0 800 800",
+  "CORE_AREA": "40 40 770 770",
+
+  "PL_TARGET_DENSITY_PCT": 45,
+  "GPL_CELL_PADDING": 2,
+  "DPL_CELL_PADDING": 1,
+
+  "RUN_CTS": true,
+  "RUN_FILL_INSERTION": true,
+  "RUN_DRT": true,
+
+  "RUN_ANTENNA_REPAIR": true,
+  "RUN_HEURISTIC_DIODE_INSERTION": true,
+  "DIODE_PADDING": 4,
+
+  "PL_RESIZE_CELLS": true,
+  "DPL_SWAP_PINS": true,
+  "SYNTH_STRATEGY": "DELAY 3"
+}
+
