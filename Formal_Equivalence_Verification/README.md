@@ -1,83 +1,136 @@
-Formal Equivalence Check
+Formal Equivalence Verification
 
-Overview
+1. Objective
 
-Formal equivalence was used to verify that the synthesized generic gate-level netlist preserves the functionality of the RTL design.
+The purpose of this step is to formally verify that the synthesized generic gate-level netlist preserves the functionality of the original RTL design.
 
-The initial EQY-based approach did not complete successfully because of conflicting signal matches during partitioning.
+The verification was performed using Yosys formal equivalence checking.
 
-Initial Equivalence Attempt
+2. Design Flow
 
-The first approach used Yosys EQY to compare the RTL and gate-level netlist.
+                RTL Design
+                    │
+                    ▼
+              Yosys Synthesis
+                    │
+                    ▼
+          Generic Gate-Level Netlist
+              generic_clean.nl.v
+                    │
+                    ▼
+             Formal Equivalence
+                    │
+          ┌─────────┴─────────┐
+          │                   │
+          ▼                   ▼
+       RTL IL          Generic Netlist IL
+      rtl.il              generic.il
+          │                   │
+          ▼                   ▼
+     memory_map           memory_map
+          │                   │
+          ▼                   ▼
+   rtl_mapped.il       generic_mapped.il
+          │                   │
+          └─────────┬─────────┘
+                    ▼
+             Yosys Equivalence
+                    │
+                    ▼
+              2719 / 2719 PASS
 
-The first issue was a conflicting match involving:
+3. Initial EQY Verification Attempt
 
-bridge1.fifo_master1.master1.master_apb.fifo_data
+The first formal verification approach used EQY to automatically partition and compare the RTL and gate-level designs.
+
+The configuration was generated using:
+
+eqy --init-config-file test.eqy top top.sv generic.nl.v
+
+The EQY flow successfully read both designs, but the automatic partitioning stage failed.
+
+3.1 First Partitioning Error
 
 EQY reported:
 
 ERROR: conflicting matches for gold bit
-bridge1.fifo_master1.master1.master_apb.fifo_data [0]
+bridge1.fifo_master1.master1.master_apb.fifo_data [0]:
 
 bridge1.fifo_master1.data_out [0]
 vs
 bridge1.fifo_master1.master1.master_apb.fifo_data [0]
 
-This was caused by EQY finding multiple possible aliases for the same internal signal.
+The issue was caused by EQY finding multiple possible internal signal matches/aliases for the same gold signal.
 
-After addressing that issue, another conflicting match appeared:
+The relevant signals were:
+
+bridge1.fifo_master1.data_out
+bridge1.fifo_master1.master1.master_apb.fifo_data
+
+Both were present as 64-bit signals in the RTL representation.
+
+3.2 Second Partitioning Error
+
+After addressing the first conflicting match, EQY encountered another conflict:
 
 ERROR: conflicting matches for gold bit
-core1.data.e1.instr [20]
+core1.data.e1.instr [20]:
 
 core1.data.e1.instr [20]
 vs
 core1.data.e1.instr [15]
 
-At this point, the EQY partitioning approach was abandoned because the automatically generated signal matching was not providing a reliable equivalence partition for this design.
+This showed that EQY's automatic internal signal matching was producing conflicting candidates during partitioning.
 
-Direct Yosys Equivalence Check
+The problem was therefore with the EQY partition/matching process, not evidence of an RTL functional bug.
 
-A direct Yosys equivalence flow was then used instead.
+4. Direct Yosys Equivalence Verification
 
-The initial proof produced:
+Because the EQY partitioning approach was not suitable for this design, a direct Yosys equivalence flow was used.
+
+The design was converted into RTLIL and the generic netlist was also converted into RTLIL.
+
+The initial equivalence process left a number of unproven equivalence cells.
+
+At one stage:
 
 Found 221 unproven $equiv cells
 
-After equiv_induct, the result was:
+A later attempt reduced the number to:
 
 107 unproven $equiv cells
 
-This was investigated further.
+5. Investigation of the Unproven Points
 
-Cause of the Unproven Points
+The equivalence log showed that several memory structures were represented as Yosys $mem_v2 cells.
 
-The equivalence log reported:
+Examples included:
 
-Warning: No SAT model available for cell
-bridge1.fifo_master1.fifo1.array ($mem_v2).
+bridge1.fifo_master1.fifo1.array ($mem_v2)
 
-Warning: No SAT model available for cell
-core1.data.r1.register ($mem_v2).
+core1.data.r1.register ($mem_v2)
 
-Warning: No SAT model available for cell
-dmem1.ram ($mem_v2).
+dmem1.ram ($mem_v2)
 
-The design contained several $mem_v2 memory representations, including:
+These correspond to memories such as:
 
-FIFO memory
+FIFO storage
 
 Register file
 
-Instruction memory
-
 Data memory
 
-Because the formal engine could not directly reason about these memory cells in the original representation, several equivalence points remained unproven.
+Other memory structures in the design
 
-Solution
+The formal engine did not have a suitable SAT model for these $mem_v2 cells in the original representation.
 
-The RTL and generic gate-level representations were both passed through Yosys memory_map.
+This prevented all equivalence points from being proven.
+
+6. Memory Mapping
+
+To make the memory structures suitable for formal reasoning, memory_map was applied to both the RTL and generic gate-level representations.
+
+RTL
 
 yosys -p '
 read_ilang rtl.il;
@@ -86,7 +139,7 @@ opt;
 write_ilang rtl_mapped.il;
 '
 
-and:
+Generic Gate-Level Netlist
 
 yosys -p '
 read_ilang generic.il;
@@ -95,80 +148,105 @@ opt;
 write_ilang generic_mapped.il;
 '
 
-The resulting files contained:
+This converted the $mem_v2 abstractions into explicit logic/register structures.
 
-0 $mem_v2 cells
+Importantly, this operation was applied equally to both designs.
 
-for both designs.
+6.1 No Verification Bypass
 
-This did not bypass the equivalence check. The memories were converted into explicit logic/register structures in both designs so that the formal SAT/induction engine could reason about them.
+The memory_map step did not bypass formal verification.
 
-Final Equivalence Check
+No equivalence points were manually removed or forced to pass.
 
-The mapped RTL and mapped generic gate-level netlist were then compared using:
+The following were not used to hide failures:
+
+Signal exclusions
+
+Forced equivalence results
+
+Manual $equiv proofs
+
+Ignored unproven points
+
+Verification waivers
+
+Instead, the same transformation was applied to both sides:
+
+RTL
+ │
+ └── memory_map ──► RTL mapped representation
+
+Generic Netlist
+ │
+ └── memory_map ──► Generic mapped representation
+
+The resulting mapped designs were then formally compared.
+
+7. Final Formal Equivalence
+
+The final equivalence flow used:
 
 equiv_make
 equiv_simple
 equiv_induct
 equiv_status -assert
 
-The final result was:
+The induction stage successfully proved all remaining equivalence points.
+
+The final Yosys result was:
 
 Found 2719 $equiv cells in equiv:
   Of those cells 2719 are proven and 0 are unproven.
 
 Equivalence successfully proven!
 
-Final Result
+8. Final Result
 
-+--------------------------+
-| Formal Equivalence       |
-+--------------------------+
-| Equivalence points       | 2719 |
-| Proven                   | 2719 |
-| Unproven                 | 0    |
-| Status                   | PASS |
-+--------------------------+
+Metric
 
-Verification Flow
+Result
 
-             RTL
-              │
-              ▼
-          Yosys IL
-              │
-              ▼
-         memory_map
-              │
-              ▼
-       rtl_mapped.il
-              │
-              │
-              │ Formal
-              │ Equivalence
-              │
-              ▼
-      generic_mapped.il
-              ▲
-              │
-         memory_map
-              ▲
-              │
-     generic gate-level
-        netlist (.nl.v)
-              ▲
-              │
-          Yosys
-        synthesis
+Total equivalence points
 
-Conclusion
+2719
 
-The initial EQY partition-based equivalence check failed because of conflicting internal signal matches.
+Proven
 
-The subsequent direct Yosys equivalence check initially left 107 points unproven because the formal engine could not directly model the $mem_v2 memories.
+2719
 
-After mapping the memories into explicit logic on both sides, the formal check successfully proved:
+Unproven
 
-2719 / 2719 equivalence points — PASS.
+0
 
-This establishes formal equivalence between the RTL and the synthesized generic gate-level implementation used in this check.
+Result
+
+PASS
+
+Verification Status
+
+╔══════════════════════════════════════╗
+║       FORMAL EQUIVALENCE PASS        ║
+╠══════════════════════════════════════╣
+║ Total equivalence points : 2719      ║
+║ Proven                   : 2719      ║
+║ Unproven                 : 0         ║
+║ Result                   : PASS      ║
+╚══════════════════════════════════════╝
+
+9. Conclusion
+
+The initial EQY verification attempt failed during automatic partitioning because of conflicting internal signal matches.
+
+A direct Yosys equivalence flow was then used. The first direct attempts left equivalence points unproven because the design contained $mem_v2 memory structures that could not be directly modeled by the formal engine.
+
+The memories were therefore mapped into explicit logic using memory_map on both the RTL and generic gate-level representations.
+
+After this transformation, Yosys successfully proved:
+
+2719 / 2719 equivalence points
+
+with:
+
+0 unproven equivalence points
+
+Therefore, the generic synthesized gate-level implementation was formally proven equivalent to the RTL representation used in this verification flow.
