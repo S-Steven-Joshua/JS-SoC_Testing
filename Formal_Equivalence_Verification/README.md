@@ -221,13 +221,6 @@ Equivalence successfully proven!
 
 ## 8. Final Result
 
-| Metric                   |   Result |
-| ------------------------ | -------: |
-| Total equivalence points | **2719** |
-| Proven                   | **2719** |
-| Unproven                 |    **0** |
-| Result                   | **PASS** |
-
 ### Verification Status
 
 ```text
