@@ -85,12 +85,12 @@ module imem(
         end
         else
         begin
-            out = ram[a[7:2]];
+            out = ram[a[6:2]];
         end
     end
     
     always_comb begin
-    if((|a[31:7]) & (|a[1:0]))begin
+        if((|a[31:7]) & (|a[1:0]))begin
     end
     end
 endmodule:imem
