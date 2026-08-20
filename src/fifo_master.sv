@@ -27,7 +27,6 @@ module fifo_master(
     input logic [63:0] data_in,
     output logic full,
     output logic [31:0] pr_data,
-    output logic tx,
     output logic wave,
     output logic wave1,
     output logic wave2
@@ -53,7 +52,6 @@ module fifo_master(
                     .fifo_empty(empty),
                     .r_en(r_en),
                     .pr_data(pr_data),
-                    .tx(tx),
                     .wave(wave),
                     .wave1(wave1),
                     .wave2(wave2)

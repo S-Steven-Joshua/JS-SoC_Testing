@@ -27,7 +27,6 @@ module master(
     input logic [63:0] fifo_data,
     input logic fifo_empty,
     output logic [31:0] pr_data,
-    output logic tx,
     output logic r_en,
     output logic wave,
     output logic wave1,
@@ -68,7 +67,6 @@ module master(
                                    .pwrite(pwrite),
                                    .pwdata(pwdata),
                                    .pr_data(pr_data),
-                                   .tx(tx),
                                    .pready(pready_uart)
                                 );
     

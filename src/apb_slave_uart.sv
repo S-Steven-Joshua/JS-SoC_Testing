@@ -32,7 +32,6 @@ module apb_slave_uart(
     //input logic master_ready,//from peripheral to ensure read is enabled
     //input logic [31:0] peri_data,//input for the peripheral data
     //output logic [31:0] p_data,//output for slave for write state
-    output logic tx,
     output logic [31:0] pr_data,//output for the peripheral data
     //output logic pwrite_en,
     output logic        pready
@@ -84,7 +83,6 @@ end
                        .wr_en(pwrite_en),
                        .master_busy(master_busy),
                        .data_out(peri_data),
-                       .tx(tx),
                        .master_ready(master_ready)
                     );
 

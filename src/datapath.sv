@@ -23,7 +23,6 @@
 module datapath(
     input logic clk,
     input logic rst,
-    input logic stall,
     input logic [1:0] result_src,
     input logic alu_src,
     input logic [1:0] pc_src,
@@ -46,7 +45,7 @@ module datapath(
     logic [31:0] result;
     logic [31:0] rd2_wire;
     //program counter logic 
-    d_ff d_ff1(.clk(clk),.rst(rst),.stall(stall),.d(pcnext),.out(pc));//d flip flop for PC
+    d_ff d_ff1(.clk(clk),.rst(rst),.d(pcnext),.out(pc));//d flip flop for PC
     adder a1(.a(pc),.b(32'd4),.c(pcplus4));//pc+4
     adder a2(.a(pc),.b(immext),.c(pcjump));//branch and jal
     mux_3 m1(.a(pcplus4),.b(pcjump),.c(pcjalr),.sel(pc_src),.y(pcnext));
