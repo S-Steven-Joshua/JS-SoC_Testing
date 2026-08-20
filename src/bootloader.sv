@@ -147,5 +147,10 @@ module bootloader(
             endcase
         end
     end
+    
+    always_comb begin
+    if(|mem[7:0]) begin
+    end
+    end
 
 endmodule
