@@ -24,11 +24,12 @@ module d_ff(
     input logic [31:0] d,
     input logic clk,
     input logic rst,
+    input logic stall,
     output logic [31:0] out
     );
     always_ff @( posedge clk)
         begin
-            if(rst)
+            if(rst | stall)
                 out<='0;
             else
                 out<=  d;

@@ -1,4 +1,4 @@
-
+ 
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -28,6 +28,7 @@ module bridge(
     input logic memwrite,
     output logic dmem_write,
     output logic [31:0] pr_data,
+    output logic tx,
     output logic wave,
     output logic wave1,
     output logic wave2
@@ -63,6 +64,7 @@ module bridge(
                             .data_in(data_in),
                             .full(full),
                             .pr_data(pr_data),
+                            .tx(tx),
                             .wave(wave),
                             .wave1(wave1),
                             .wave2(wave2)
