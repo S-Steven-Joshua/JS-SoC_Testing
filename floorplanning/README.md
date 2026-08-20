@@ -1,6 +1,4 @@
-Yes. **Everything below is one single `README.md` file**. Copy-paste the entire block into `README.md`.
 
-````markdown
 # Floorplanning
 
 ## Overview
