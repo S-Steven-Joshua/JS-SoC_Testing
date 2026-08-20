@@ -1,1 +1,2 @@
-librelane --flow Classic --to OpenROAD.Checker.LintWarnings config.json
+librelane --flow Classic --to Checker.LintWarnings config.json
+
