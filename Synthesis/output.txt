@@ -1,5 +1,8 @@
-design__inferred_latch__count	0
-design__instance__count	6767
-design__instance__area	88167.0592
-design__instance_unmapped__count	0
-synthesis__check_error__count	0
+    "design__lint_error__count": 0,
+    "design__lint_timing_construct__count": 0,
+    "design__lint_warning__count": 0,
+    "design__inferred_latch__count": 0,
+    "design__instance__count": 8873,
+    "design__instance__area": 96308.6176,
+    "design__instance_unmapped__count": 0,
+    "synthesis__check_error__count": 0
