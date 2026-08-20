@@ -7,7 +7,7 @@ Linting checks the RTL for syntax errors, coding issues, and potential design pr
 Run inside the LibreLane Nix shell:
 
 ```bash
-librelane --flow Classic --to OpenROAD.Checker.LintWarnings config.json
+ librelane --flow Classic --to Checker.LintWarnings config.json
 ```
 
 ## Output
