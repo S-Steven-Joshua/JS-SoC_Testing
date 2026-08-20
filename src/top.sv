@@ -23,14 +23,17 @@
 module top(
     input logic clk,
     input logic rst,
-    output logic [31:0] write_data,data_add,
-    output logic mem_write,
+    //output logic [31:0] write_data,data_add,
+    //output logic mem_write,
     output logic [31:0] pr_data,
     output logic wave,
     output logic wave1,
     output logic wave2
     );
     logic memwrite;
+    logic [31:0] write_data;
+    logic [31:0] data_add;
+    logic mem_write;
     logic [31:0] pc,instr,read_data;
     core core1(.clk(clk),.rst(rst),.instr(instr),.read_data(read_data),
                .pc(pc),.alu_result(data_add),.write_data(write_data),.mem_write(memwrite));
